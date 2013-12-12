@@ -1,11 +1,26 @@
 <?php
 /**
  * @file
- * Handles installation and uninstallation of the node queue used by this
+ * Handles installation and un-installation of the node queue used by this
  * module.
  *
  * Also contains update functions to install the node queue on existing sites.
  */
+
+/**
+ * Implements hook_install().
+ */
+function ding_groups_install() {
+  ding_groups_install_nodequeue();
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function ding_groups_uninstall() {
+  $queue = nodequeue_load_queue_by_name('ding_groups_listning');
+  nodequeue_delete($queue->qid);
+}
 
 /**
  * Helper function to create node queue used in groups listing pages.
@@ -41,23 +56,6 @@ function ding_groups_install_nodequeue() {
   nodequeue_save($nodequeue);
 }
 
- /**
-  * Implements hook_install().
-  */
-function ding_groups_install() {
-  ding_groups_install_nodequeue();
-}
-
-/**
- * Implements hook_uninstall().
- */
-function ding_groups_uninstall() {
-  $qids = nodequeue_get_qids('ding_group');
-  foreach ($qids as $qid) {
-    nodequeue_delete($qid);
-  }
-}
-
 /**
  * Add groups node queue if it do not exists.
  */
@@ -66,4 +64,11 @@ function ding_groups_update_7001() {
   if (empty($qids)) {
     ding_groups_install_nodequeue();
   }
+}
+
+/**
+ * Add menu-position rule.
+ */
+function ding_groups_update_7002() {
+  ding_groups_install_menu_position();
 }
